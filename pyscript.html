@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Air Quality Index</title>
+    </head>
+    <body>
+        <h1>Air Quality Index</h1>
+        <p>The current air quality index and a 5-day forecast:</p>
+        <div id="output">
+        </div>
+        <script>
+            async function get_air_quality_data() {
+                const response = await fetch("https://api.waqi.info/feed/here/?token=a18e786bfa25d4a26a36d645094ab201f40e045a");
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    return data.data.aqi;
+                } else {
+                    throw new Error("Failed to retrieve air quality data");
+                }
+            }
+
+            async function get_forecast() {
+                const response = await fetch("https://api.waqi.info/feed/here/?token=a18e786bfa25d4a26a36d645094ab201f40e045a");
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    return data.data.forecast.daily.pm25.slice(0, 5);
+                } else {
+                    throw new Error("Failed to retrieve air quality data");
+                }
+            }
+
+            async function display_air_quality_index() {
+                const aqi = await get_air_quality_data();
+                const forecast = await get_forecast();
+                let output = "<p>Current aqi: " + aqi + "</p>";
+                output += "<p>Forecast for 5 days:</p>";
+                for (let i = 0; i < forecast.length; i++) {
+                    output += "<p>Day " + (i + 1) + ": average aqi: " + forecast[i].avg + "</p>";
+                }
+                document.getElementById("output").innerHTML = output;
+            }
+
+            display_air_quality_index();
+        </script>
+    </body>
+</html>
